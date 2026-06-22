@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Libro Mayor — Procesos contables paso a paso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F1E7; --paper-deep:#EFE7D6; --ink:#1F2A24;
+    --ledger:#1F4D3D; --ledger-dark:#163829; --debit:#A3413B; --gold:#B6862F;
+    --line:#D8CFB8; --line-soft:#E4DCC8; --max:1120px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  img,svg{display:block;max-width:100%;}
+  a{color:inherit;}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 28px;}
+  .ruled{background-image:repeating-linear-gradient(to bottom,transparent,transparent 38px,var(--line-soft) 39px);}
+  h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:600;margin:0;letter-spacing:-0.01em;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ledger);display:flex;align-items:center;gap:8px;}
+  .eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--debit);flex:none;}
+  .num{font-family:'IBM Plex Mono',monospace;}
+  :focus-visible{outline:3px solid var(--gold);outline-offset:3px;}
+  @media (prefers-reduced-motion: reduce){*{animation:none !important; transition:none !important;}}
+
+  header{position:sticky;top:0;z-index:50;background:rgba(246,241,231,0.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0;}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Fraunces',serif;font-weight:700;font-size:21px;text-decoration:none;color:var(--ink);}
+  .brand-mark{width:30px;height:30px;border:1.6px solid var(--ledger);border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--ledger);background:var(--paper);}
+  nav.links{display:flex;gap:28px;font-size:14.5px;font-weight:500;}
+  nav.links a{text-decoration:none;opacity:0.8;transition:opacity .15s;}
+  nav.links a:hover{opacity:1;}
+  .cta-btn{background:var(--ledger);color:var(--paper);padding:10px 20px;border-radius:3px;font-size:14px;font-weight:600;text-decoration:none;border:1px solid var(--ledger);transition:transform .15s ease, background .15s ease;white-space:nowrap;display:inline-block;}
+  .cta-btn:hover{background:var(--ledger-dark);transform:translateY(-1px);}
+  .cta-ghost{background:transparent;color:var(--ink);border:1px solid var(--ink);}
+  .cta-ghost:hover{background:var(--ink);color:var(--paper);}
+
+  .hero{padding:78px 0 60px;position:relative;}
+  .hero-grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:56px;align-items:center;}
+  .hero h1{font-size:clamp(32px,4.2vw,50px);line-height:1.08;margin:18px 0 22px;}
+  .hero h1 em{font-style:normal;color:var(--ledger);border-bottom:3px double var(--gold);}
+  .hero p.lead{font-size:17px;max-width:480px;color:#3a4540;margin-bottom:28px;}
+  .hero-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+  .hero-note{margin-top:18px;font-size:13px;color:#5b655f;font-family:'IBM Plex Mono',monospace;}
+
+  .taccount{background:var(--paper-deep);border:1px solid var(--line);border-radius:6px;padding:26px 26px 18px;box-shadow:0 18px 40px -22px rgba(31,42,36,0.35);}
+  .taccount-title{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#6b6354;margin-bottom:14px;}
+  .t-head{display:grid;grid-template-columns:1fr 1fr;font-family:'Fraunces',serif;font-weight:600;font-size:15px;text-align:center;padding-bottom:10px;position:relative;}
+  .t-head::after{content:'';position:absolute;left:50%;top:0;bottom:-2px;width:1px;background:var(--ink);}
+  .t-head span:first-child{color:var(--debit);}
+  .t-head span:last-child{color:var(--ledger);}
+  .t-rule{height:2px;background:var(--ink);margin-bottom:14px;}
+  .t-body{display:grid;grid-template-columns:1fr 1fr;position:relative;min-height:60px;}
+  .t-body::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line);}
+  .t-col{padding:2px 16px 6px;font-size:13.5px;}
+  .t-col.debit{padding-right:18px;} .t-col.credit{padding-left:18px;}
+  .t-row{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);}
+  .t-row:last-child{border-bottom:none;}
+  .t-row .v{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5b655f;flex:none;}
+  .t-total{margin-top:10px;padding-top:10px;border-top:3px double var(--ink);display:grid;grid-template-columns:1fr 1fr;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;text-align:center;color:var(--ink);}
+
+  section{padding:70px 0;}
+  .section-head{max-width:640px;margin-bottom:40px;}
+  .section-head h2{font-size:clamp(25px,3vw,34px);margin-top:14px;}
+  .section-head p{color:#454f49;font-size:16px;margin-top:12px;}
+
+  .ad-slot{border:1.5px dashed var(--line);border-radius:6px;background:var(--paper-deep);padding:22px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8a8268;letter-spacing:0.03em;}
+  .ad-slot.banner{max-width:var(--max);margin:0 auto;padding:18px;}
+  .ad-slot.inline{margin:50px 0;}
+
+  .stats{background:var(--ledger);color:var(--paper);}
+  .stats .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:30px;}
+  .stat b{display:block;font-family:'IBM Plex Mono',monospace;font-size:clamp(26px,3.6vw,38px);color:#E9C46A;font-weight:600;}
+  .stat span{font-size:13.5px;opacity:0.85;display:block;margin-top:6px;}
+
+  .process{background:var(--paper-deep);}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;}
+  .step{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:22px 20px;}
+  .step .stepnum{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--paper);background:var(--ledger);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-weight:600;}
+  .step h3{font-size:15.5px;margin-bottom:7px;}
+  .step p{margin:0;font-size:13px;color:#454f49;}
+
+  /* Accordion (procesos / casos) */
+  .accordion-list{border-top:1px solid var(--line);}
+  details.acc-item{border-bottom:1px solid var(--line);}
+  details.acc-item summary{display:grid;grid-template-columns:60px 1fr auto auto;gap:16px;align-items:center;padding:22px 0;cursor:pointer;list-style:none;}
+  details.acc-item summary::-webkit-details-marker{display:none;}
+  .acc-code{font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--debit);font-weight:600;}
+  .acc-title h3{font-size:17px;}
+  .acc-title p{margin:4px 0 0;font-size:13.5px;color:#6b6354;}
+  .acc-meta{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6b6354;white-space:nowrap;}
+  .acc-chev{font-family:'IBM Plex Mono',monospace;color:#6b6354;transition:transform .15s ease;}
+  details.acc-item[open] .acc-chev{transform:rotate(90deg);}
+  .acc-body{padding:0 0 30px;max-width:720px;}
+  .acc-body h4{font-size:15px;margin:20px 0 8px;color:var(--ledger);}
+  .acc-body h4:first-child{margin-top:4px;}
+  .acc-body ol, .acc-body ul{padding-left:20px;font-size:14.5px;color:#33392f;line-height:1.65;margin:0;}
+  .acc-body li{margin-bottom:6px;}
+  table.ledger-table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:13px;margin-top:6px;}
+  .ledger-table th{font-family:'Inter',sans-serif;font-weight:600;font-size:12.5px;text-align:left;color:#6b6354;padding:6px 8px;border-bottom:1px solid var(--ink);}
+  .ledger-table td{padding:7px 8px;border-bottom:1px dashed var(--line);}
+  .ledger-table th:last-child,.ledger-table td:last-child{text-align:right;}
+  .ledger-table tfoot td{border-top:3px double var(--ink);border-bottom:none;font-weight:600;}
+  .glosa{font-size:13px;font-style:italic;color:#6b6354;margin-top:8px;}
+  .indent{padding-left:22px;}
+
+  /* Calculator */
+  .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  .calc-card{background:var(--paper-deep);border:1px solid var(--line);border-radius:8px;padding:26px;}
+  .calc-card h3{font-size:18px;margin-bottom:6px;}
+  .calc-card>p{font-size:13.5px;color:#6b6354;margin:0 0 18px;}
+  .calc-row{display:grid;grid-template-columns:1fr 100px 100px 30px;gap:8px;margin-bottom:8px;align-items:center;}
+  .calc-row.header-row{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6b6354;text-transform:uppercase;letter-spacing:0.05em;}
+  .calc-row input{width:100%;font-family:'Inter',sans-serif;font-size:13.5px;padding:8px 9px;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink);}
+  .row-del{background:none;border:none;color:var(--debit);font-size:18px;cursor:pointer;line-height:1;}
+  .calc-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+  .btn-mini{font-family:'IBM Plex Mono',monospace;font-size:12.5px;padding:9px 16px;border:1px solid var(--ledger);border-radius:4px;background:transparent;color:var(--ledger);cursor:pointer;}
+  .btn-mini:hover{background:var(--ledger);color:var(--paper);}
+  .btn-mini.solid{background:var(--ledger);color:var(--paper);}
+  .btn-mini.solid:hover{background:var(--ledger-dark);}
+  .calc-result{margin-top:16px;padding:14px 16px;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:13.5px;display:none;}
+  .calc-result.show{display:block;}
+  .calc-result.ok{background:rgba(31,77,61,.12);color:var(--ledger);border:1px solid var(--ledger);}
+  .calc-result.bad{background:rgba(163,65,59,.12);color:var(--debit);border:1px solid var(--debit);}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:13px;color:#454f49;margin-bottom:5px;}
+  .field input,.field select{width:100%;font-family:'Inter',sans-serif;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink);}
+
+  /* Glossary */
+  .glossary-search{width:100%;padding:13px 15px;border:1px solid var(--line);border-radius:6px;font-family:'Inter',sans-serif;font-size:15px;margin-bottom:24px;background:var(--paper);}
+  .glossary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  .gloss-card{background:var(--paper-deep);border:1px solid var(--line);border-radius:6px;padding:16px 18px;}
+  .gloss-card b{font-family:'Fraunces',serif;font-size:15px;display:block;margin-bottom:4px;color:var(--ledger);}
+  .gloss-card p{font-size:13px;color:#454f49;margin:0;}
+  .gloss-empty{font-size:14px;color:#6b6354;font-style:italic;display:none;}
+
+  .testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .quote{background:var(--paper-deep);border-radius:8px;padding:26px;border:1px solid var(--line);}
+  .quote p{font-size:14.5px;font-style:italic;color:#33392f;margin:0 0 16px;}
+  .quote .who{display:flex;align-items:center;gap:10px;}
+  .avatar{width:36px;height:36px;border-radius:50%;background:var(--ledger);color:var(--paper);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:600;font-size:14px;flex:none;}
+  .who b{font-size:13.5px;display:block;} .who span{font-size:12px;color:#6b6354;}
+
+  .closer{background:var(--ledger-dark);color:var(--paper);text-align:center;padding:84px 0;}
+  .closer h2{font-size:clamp(26px,4vw,40px);max-width:680px;margin:0 auto 16px;}
+  .closer p{opacity:0.85;max-width:480px;margin:0 auto 28px;font-size:16px;}
+
+  footer{padding:36px 0;border-top:1px solid var(--line);}
+  .foot-grid{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;}
+  footer p{font-size:13px;color:#6b6354;margin:0;}
+
+  @media (max-width:880px){
+    .hero-grid{grid-template-columns:1fr;}
+    nav.links{display:none;}
+    .stats .wrap{grid-template-columns:repeat(2,1fr);}
+    .steps{grid-template-columns:1fr 1fr;}
+    .testimonials{grid-template-columns:1fr;}
+    .calc-grid{grid-template-columns:1fr;}
+    .glossary-grid{grid-template-columns:1fr;}
+    details.acc-item summary{grid-template-columns:40px 1fr auto;}
+    .acc-meta{display:none;}
+  }
+  @media (max-width:520px){
+    .hero{padding:56px 0 46px;}
+    .stats .wrap{grid-template-columns:1fr 1fr;gap:20px;}
+    .steps{grid-template-columns:1fr;}
+    .calc-row{grid-template-columns:1fr 80px 80px 24px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="#" class="brand"><span class="brand-mark">LM</span>Libro Mayor</a>
+    <nav class="links">
+      <a href="#procesos">Procesos</a>
+      <a href="#casos">Casos prácticos</a>
+      <a href="#calculadora">Calculadora</a>
+      <a href="#glosario">Glosario</a>
+    </nav>
+    <a href="#procesos" class="cta-btn">Explorar</a>
+  </div>
+</header>
+
+<section class="hero ruled">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">Biblioteca de procesos contables · 100% gratis</p>
+      <h1>Cada proceso contable, explicado<br>paso a paso. <em>Sin cursos de relleno.</em></h1>
+      <p class="lead">Encuentra el procedimiento exacto para hacer una partida, mayorizar, ajustar, cerrar el período o armar tus estados financieros — con ejemplo numérico, asiento resuelto y la teoría justa para entenderlo.</p>
+      <div class="hero-actions">
+        <a href="#procesos" class="cta-btn">Ver procesos</a>
+        <a href="#calculadora" class="cta-btn cta-ghost">Probar calculadoras</a>
+      </div>
+      <p class="hero-note">6 procesos completos · 2 casos prácticos resueltos · glosario de +25 términos</p>
+    </div>
+    <div class="taccount">
+      <p class="taccount-title">Ejemplo: partida por pago de nómina</p>
+      <div class="t-head"><span>DEBE</span><span>HABER</span></div>
+      <div class="t-rule"></div>
+      <div class="t-body">
+        <div class="t-col debit"><div class="t-row"><span>Gastos de nómina</span><span class="v">$5,000</span></div></div>
+        <div class="t-col credit"><div class="t-row"><span>Banco</span><span class="v">$5,000</span></div></div>
+      </div>
+      <div class="t-total"><span>Total: $5,000</span><span>Total: $5,000</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="ad-slot banner">[ Espacio publicitario · Google AdSense ]</div></div>
+
+<section class="stats">
+  <div class="wrap">
+    <div class="stat"><b class="num">6</b><span>procesos contables documentados</span></div>
+    <div class="stat"><b class="num">2</b><span>casos prácticos resueltos paso a paso</span></div>
+    <div class="stat"><b class="num">5</b><span>ejercicios con solución incluida</span></div>
+    <div class="stat"><b class="num">+25</b><span>términos explicados en el glosario</span></div>
+  </div>
+</section>
+
+<section class="process">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">El uso</p>
+      <h2>Cómo funciona la biblioteca</h2>
+      <p>Sin registro ni vueltas. Así se usa cada sección.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="stepnum num">1</div><h3>Busca tu proceso</h3><p>Encuéntralo por nombre o por su código, como en un plan de cuentas.</p></div>
+      <div class="step"><div class="stepnum num">2</div><h3>Ábrelo y lee el procedimiento</h3><p>Cada proceso trae los pasos exactos, sin teoría de relleno.</p></div>
+      <div class="step"><div class="stepnum num">3</div><h3>Revisa el ejemplo resuelto</h3><p>Verás el caso aplicado con cifras reales y el asiento completo.</p></div>
+      <div class="step"><div class="stepnum num">4</div><h3>Pruébalo en la calculadora</h3><p>Aplica el mismo procedimiento a tus propios números.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="procesos">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Plan de cuentas de la biblioteca</p>
+      <h2>Cada proceso, con su propio código</h2>
+      <p>Igual que en un plan de cuentas real. Haz clic en cualquiera para abrirlo.</p>
+    </div>
+
+    <div class="accordion-list">
+
+      <details class="acc-item">
+        <summary>
+          <span class="acc-code num">100</span>
+          <span class="acc-title"><h3>Cómo hacer una partida contable</h3><p>El registro de doble entrada, desde cero.</p></span>
+          <span class="acc-meta">4 min</span>
+          <span class="acc-chev num">›</span>
+        </summary>
+        <div class="acc-body">
+          <h4>Qué es</h4>
+          <p style="font-size:14.5px;color:#33392f;margin:0;">La partida doble establece que toda transacción debe registrarse afectando al menos dos cuentas, de forma que la suma del Debe sea siempre igual a la suma del Haber. Así, la ecuación contable (Activo = Pasivo + Patrimonio) nunca se desequilibra.</p>
+          <h4>Procedimiento</h4>
+          <ol>
+            <li>Identifica la transacción y el documento que la soporta (factura, recibo, contrato).</li>
+            <li>Determina qué cuentas afecta, usando tu plan de cuentas.</li>
+            <li>Decide qué cuenta se carga (Debe) y cuál se acredita (Haber): los Activos y Gastos aumentan por el Debe; los Pasivos, el Patrimonio y los Ingresos aumentan por el Haber.</li>
+            <li>Verifica que el total del Debe sea igual al total del Haber.</li>
+            <li>Redacta la glosa explicando la transacción.</li>
+            <li>Registra el asiento en el Libro Diario, con fecha.</li>
+          </ol>
+          <h4>Ejemplo resuelto</h4>
+          <table class="ledger-table">
+            <thead><tr><th>Cuenta</th><th>Debe (Q)</th><th>Haber (Q)</th></tr></thead>
+            <tbody>
+              <tr><td>Caja</td><td>50,000</td><td>—</td></tr>
+              <tr><td class="indent">Capital Social</td><td>—</td><td>50,000</td></tr>
+            </tbody>
+          </table>
+          <p class="glosa">Glosa: aporte inicial de capital de los socios en efectivo.</p>
+        </div>
+      </details>
+
+      <details class="acc-item">
+        <summary>
+          <span class="acc-code num">200</span>
+          <span class="acc-title"><h3>Cómo mayorizar: del Diario al Mayor</h3><p>Agrupar los movimientos por cuenta.</p></span>
+          <span class="acc-meta">5 min</span>
+          <span class="acc-chev num">›</span>
+        </summary>
+        <div class="acc-body">
+          <h4>Qué es</h4>
+          <p style="font-size:14.5px;color:#33392f;margin:0;">Mientras el Libro Diario muestra las transacciones en orden cronológico, el Libro Mayor las reorganiza por cuenta. A este traslado se le llama mayorización, y permite conocer el saldo de cada cuenta en cualquier momento.</p>
+          <h4>Procedimiento</h4>
+          <ol>
+            <li>Abre una cuenta T para cada cuenta que aparece en el Diario.</li>
+            <li>Traslada cada monto del Debe del asiento al lado Debe de la cuenta correspondiente.</li>
+            <li>Traslada cada monto del Haber al lado Haber de la cuenta correspondiente.</li>
+            <li>Suma cada lado por separado.</li>
+            <li>Calcula la diferencia entre ambos lados: ese es el saldo, deudor o acreedor.</li>
+          </ol>
+          <h4>Ejemplo resuelto — Cuenta de Caja</h4>
+          <table class="ledger-table">
+            <thead><tr><th>Debe (Q)</th><th>Haber (Q)</th></tr></thead>
+            <tbody>
+              <tr><td>50,000 + 15,000 + 4,000</td><td>8,000 + 5,000 + 3,000 + 6,000 + 3,000 + 800</td></tr>
+            </tbody>
+            <tfoot><tr><td>Total: 69,000</td><td>Total: 25,800</td></tr></tfoot>
+          </table>
+          <p class="glosa">Saldo de Caja: Q43,200, deudor (69,000 − 25,800).</p>
+        </div>
+      </details>
+
+      <details class="acc-item">
+        <summary>
+          <span class="acc-code num">300</span>
+          <span class="acc-title"><h3>Cómo elaborar un Balance de Comprobación</h3><p>Verificar que la contabilidad esté en equilibrio.</p></span>
+          <span class="acc-meta">4 min</span>
+          <span class="acc-chev num">›</span>
+        </summary>
+        <div class="acc-body">
+          <h4>Qué es</h4>
+          <p style="font-size:14.5px;color:#33392f;margin:0;">Es un listado de todas las cuentas del Mayor con su saldo final, clasificado como deudor o acreedor. Su propósito es verificar que la suma de los saldos deudores sea igual a la suma de los saldos acreedores.</p>
+          <h4>Procedimiento</h4>
+          <ol>
+            <li>Lista todas las cuentas del Mayor con su saldo final.</li>
+            <li>Clasifica cada saldo como deudor (columna izquierda) o acreedor (columna derecha).</li>
+            <li>Suma la columna de saldos deudores.</li>
+            <li>Suma la columna de saldos acreedores.</li>
+            <li>Verifica que ambos totales coincidan; si no, hay un error que corregir antes de continuar.</li>
+          </ol>
+          <h4>Ejemplo resuelto</h4>
+          <table class="ledger-table">
+            <thead><tr><th>Cuenta</th><th>Deudor (Q)</th><th>Acreedor (Q)</th></tr></thead>
+            <tbody>
+              <tr><td>Caja</td><td>43,200</td><td>—</td></tr>
+              <tr><td>Cuentas por Cobrar</td><td>5,000</td><td>—</td></tr>
+              <tr><td>Mobiliario y Equipo</td><td>8,000</td><td>—</td></tr>
+              <tr><td>Equipo de Cómputo</td><td>12,000</td><td>—</td></tr>
+              <tr><td>Cuentas por Pagar</td><td>—</td><td>4,000</td></tr>
+              <tr><td>Capital Social</td><td>—</td><td>50,000</td></tr>
+              <tr><td>Ingresos por Servicios</td><td>—</td><td>24,000</td></tr>
+              <tr><td>Gastos (Renta, Sueldos, Papelería)</td><td>9,800</td><td>—</td></tr>
+            </tbody>
+            <tfoot><tr><td>TOTALES</td><td>78,000</td><td>78,000</td></tr></tfoot>
+          </table>
+        </div>
+      </details>
+
+      <details class="acc-item">
+        <summary>
+          <span class="acc-code num">400</span>
+          <span class="acc-title"><h3>Cómo registrar los ajustes contables</h3><p>Depreciación, devengados, diferidos e incobrables.</p></span>
+          <span class="acc-meta">7 min</span>
+          <span class="acc-chev num">›</span>
+        </summary>
+        <div class="acc-body">
+          <h4>Qué es</h4>
+          <p style="font-size:14.5px;color:#33392f;margin:0;">Algunos hechos económicos no generan un documento evidente en el día a día, pero igual deben reconocerse para que los estados financieros reflejen la realidad del periodo. Los ajustes más comunes son cuatro:</p>
+
+          <h4>1 · Depreciación</h4>
+          <p style="font-size:14px;color:#454f49;margin:0 0 6px;">Distribuye el costo de un activo fijo a lo largo de su vida útil. Ejemplo: equipo de Q12,000 con vida útil de 4 años (línea recta) = Q3,000 anuales = Q250 mensuales.</p>
+          <table class="ledger-table">
+            <tbody><tr><td>Gasto de Depreciación</td><td>250</td><td>—</td></tr><tr><td class="indent">Depreciación Acumulada</td><td>—</td><td>250</td></tr></tbody>
+          </table>
+
+          <h4>2 · Gastos devengados (acumulados)</h4>
+          <p style="font-size:14px;color:#454f49;margin:0 0 6px;">Se reconoce el gasto del trabajo ya realizado, aunque se pague hasta el mes siguiente. Ejemplo: Q2,500 de sueldos pendientes al cierre.</p>
+          <table class="ledger-table">
+            <tbody><tr><td>Gasto de Sueldos</td><td>2,500</td><td>—</td></tr><tr><td class="indent">Sueldos por Pagar</td><td>—</td><td>2,500</td></tr></tbody>
+          </table>
+
+          <h4>3 · Gastos diferidos (pagados por anticipado)</h4>
+          <p style="font-size:14px;color:#454f49;margin:0 0 6px;">Al pagar, todo se registra como activo; cada mes se reconoce la parte que corresponde como gasto. Ejemplo: Q6,000 de renta por 3 meses → Q2,000 de gasto el primer mes.</p>
+          <table class="ledger-table">
+            <tbody><tr><td>Gasto de Renta</td><td>2,000</td><td>—</td></tr><tr><td class="indent">Rentas Pagadas por Anticipado</td><td>—</td><td>2,000</td></tr></tbody>
+          </table>
+
+          <h4>4 · Estimación para cuentas incobrables</h4>
+          <p style="font-size:14px;color:#454f49;margin:0 0 6px;">Se reconoce, de forma anticipada, que parte de las cuentas por cobrar podría no recuperarse. Ejemplo: 2% estimado sobre Q5,000.</p>
+          <table class="ledger-table">
+            <tbody><tr><td>Gasto por Cuentas Incobrables</td><td>100</td><td>—</td></tr><tr><td class="indent">Estimación para Cuentas Incobrables</td><td>—</td><td>100</td></tr></tbody>
+          </table>
+        </div>
+      </details>
+
+      <details class="acc-item">
+        <summary>
+          <span class="acc-code num">500</span>
+          <span class="acc-title"><h3>Cómo armar los Estados Financieros</h3><p>Del balance ajustado a Resultados y Balance General.</p></span>
+          <span class="acc-meta">6 min</span>
+          <span class="acc-chev num">›</span>
+        </summary>
+        <div class="acc-body">
+          <h4>Procedimiento</h4>
+          <ol>
+            <li>Toma el Balance de Comprobación ya ajustado.</li>
+            <li>Separa las cuentas de Ingresos y Gastos para armar el Estado de Resultados.</li>
+            <li>Resta los Gastos de los Ingresos para obtener la Utilidad del Ejercicio.</li>
+            <li>Clasifica las cuentas de Activo, Pasivo y Patrimonio para el Balance General.</li>
+            <li>Verifica que el Total Activo sea igual a Pasivo + Patrimonio.</li>
+          </ol>
+          <h4>Estado de Resultados — ejemplo</h4>
+          <table class="ledger-table">
+            <tbody>
+              <tr><td>Ingresos por Servicios</td><td>24,000</td></tr>
+              <tr><td>(−) Gastos de Operación</td><td>9,800</td></tr>
+            </tbody>
+            <tfoot><tr><td>Utilidad del Ejercicio</td><td>14,200</td></tr></tfoot>
+          </table>
+          <h4>Balance General — ejemplo</h4>
+          <table class="ledger-table">
+            <tbody>
+              <tr><td>Total Activo</td><td>68,200</td></tr>
+              <tr><td>Total Pasivo</td><td>4,000</td></tr>
+              <tr><td>Total Patrimonio</td><td>64,200</td></tr>
+            </tbody>
+            <tfoot><tr><td>Pasivo + Patrimonio</td><td>68,200</td></tr></tfoot>
+          </table>
+          <p class="glosa">68,200 = 68,200 — la ecuación contable se cumple.</p>
+        </div>
+      </details>
+
+      <details class="acc-item">
+        <summary>
+          <span class="acc-code num">600</span>
+          <span class="acc-title"><h3>Cómo hacer el cierre contable</h3><p>Dejar las cuentas nominales en cero.</p></span>
+          <span class="acc-meta">5 min</span>
+          <span class="acc-chev num">›</span>
+        </summary>
+        <div class="acc-body">
+          <h4>Qué es</h4>
+          <p style="font-size:14.5px;color:#33392f;margin:0;">Las cuentas de Ingresos y Gastos son "nominales": miden el resultado de un periodo específico y deben quedar en cero para empezar el siguiente desde cero. Las de Activo, Pasivo y Patrimonio son "reales" y se trasladan tal cual al periodo siguiente.</p>
+          <h4>Procedimiento</h4>
+          <ol>
+            <li>Identifica las cuentas nominales (Ingresos y Gastos).</li>
+            <li>Traslada el saldo de Ingresos a la cuenta puente "Pérdidas y Ganancias".</li>
+            <li>Traslada los saldos de Gastos a la misma cuenta puente.</li>
+            <li>Calcula el resultado neto dentro de Pérdidas y Ganancias.</li>
+            <li>Traslada ese resultado a Utilidades Retenidas, dentro del Patrimonio.</li>
+          </ol>
+          <h4>Ejemplo resuelto</h4>
+          <table class="ledger-table">
+            <tbody>
+              <tr><td>Ingresos por Servicios</td><td>24,000</td><td>—</td></tr>
+              <tr><td class="indent">Pérdidas y Ganancias</td><td>—</td><td>24,000</td></tr>
+              <tr><td>Pérdidas y Ganancias</td><td>9,800</td><td>—</td></tr>
+              <tr><td class="indent">Gastos de Sueldos, Renta y Papelería</td><td>—</td><td>9,800</td></tr>
+              <tr><td>Pérdidas y Ganancias</td><td>14,200</td><td>—</td></tr>
+              <tr><td class="indent">Utilidades Retenidas</td><td>—</td><td>14,200</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<section id="casos" class="process">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">De principio a fin</p>
+      <h2>Casos prácticos resueltos</h2>
+      <p>El ciclo contable completo aplicado a dos negocios reales.</p>
+    </div>
+    <div class="accordion-list">
+
+      <details class="acc-item">
+        <summary>
+          <span class="acc-code num">C1</span>
+          <span class="acc-title"><h3>Asesoría Contable XYZ, S.A.</h3><p>Empresa de servicios — ciclo contable completo.</p></span>
+          <span class="acc-meta">10 asientos</span>
+          <span class="acc-chev num">›</span>
+        </summary>
+        <div class="acc-body">
+          <p style="font-size:14.5px;color:#33392f;">Inicia operaciones en enero: los socios aportan Q50,000, compra mobiliario y equipo, presta servicios al contado y a crédito, paga renta y sueldos, y cobra y paga deudas parciales.</p>
+          <table class="ledger-table">
+            <thead><tr><th>Cuenta</th><th>Debe (Q)</th><th>Haber (Q)</th></tr></thead>
+            <tbody>
+              <tr><td>Caja</td><td>50,000</td><td>—</td></tr><tr><td class="indent">Capital Social</td><td>—</td><td>50,000</td></tr>
+              <tr><td>Mobiliario y Equipo</td><td>8,000</td><td>—</td></tr><tr><td class="indent">Caja</td><td>—</td><td>8,000</td></tr>
+              <tr><td>Equipo de Cómputo</td><td>12,000</td><td>—</td></tr><tr><td class="indent">Caja / Cuentas por Pagar</td><td>—</td><td>5,000 / 7,000</td></tr>
+              <tr><td>Caja</td><td>15,000</td><td>—</td></tr><tr><td class="indent">Ingresos por Servicios</td><td>—</td><td>15,000</td></tr>
+              <tr><td>Gastos de Renta</td><td>3,000</td><td>—</td></tr><tr><td class="indent">Caja</td><td>—</td><td>3,000</td></tr>
+              <tr><td>Cuentas por Cobrar</td><td>9,000</td><td>—</td></tr><tr><td class="indent">Ingresos por Servicios</td><td>—</td><td>9,000</td></tr>
+              <tr><td>Gastos de Sueldos</td><td>6,000</td><td>—</td></tr><tr><td class="indent">Caja</td><td>—</td><td>6,000</td></tr>
+              <tr><td>Caja</td><td>4,000</td><td>—</td></tr><tr><td class="indent">Cuentas por Cobrar</td><td>—</td><td>4,000</td></tr>
+              <tr><td>Cuentas por Pagar</td><td>3,000</td><td>—</td></tr><tr><td class="indent">Caja</td><td>—</td><td>3,000</td></tr>
+              <tr><td>Gastos de Papelería y Útiles</td><td>800</td><td>—</td></tr><tr><td class="indent">Caja</td><td>—</td><td>800</td></tr>
+            </tbody>
+          </table>
+          <p class="glosa">Resultado: Utilidad del Ejercicio Q14,200 · Total Activo Q68,200 = Pasivo + Patrimonio Q68,200. Mayorización y estados completos en los procesos 200 y 500.</p>
+        </div>
+      </details>
+
+      <details class="acc-item">
+        <summary>
+          <span class="acc-code num">C2</span>
+          <span class="acc-title"><h3>Distribuidora Quetzal, S.A.</h3><p>Empresa comercial — compra, venta e IVA.</p></span>
+          <span class="acc-meta">4 asientos</span>
+          <span class="acc-chev num">›</span>
+        </summary>
+        <div class="acc-body">
+          <p style="font-size:14.5px;color:#33392f;">Compra y vende mercadería, mostrando cómo se tratan el IVA (12%) y el costo de ventas.</p>
+          <table class="ledger-table">
+            <thead><tr><th>Cuenta</th><th>Debe (Q)</th><th>Haber (Q)</th></tr></thead>
+            <tbody>
+              <tr><td>Inventario de Mercaderías</td><td>20,000</td><td>—</td></tr>
+              <tr><td>IVA por Cobrar (crédito fiscal)</td><td>2,400</td><td>—</td></tr>
+              <tr><td class="indent">Caja</td><td>—</td><td>22,400</td></tr>
+              <tr><td>Caja</td><td>39,200</td><td>—</td></tr>
+              <tr><td class="indent">Ventas</td><td>—</td><td>35,000</td></tr>
+              <tr><td class="indent">IVA por Pagar (débito fiscal)</td><td>—</td><td>4,200</td></tr>
+              <tr><td>Costo de Ventas</td><td>20,000</td><td>—</td></tr>
+              <tr><td class="indent">Inventario de Mercaderías</td><td>—</td><td>20,000</td></tr>
+              <tr><td>Gastos de Renta</td><td>2,000</td><td>—</td></tr><tr><td class="indent">Caja</td><td>—</td><td>2,000</td></tr>
+              <tr><td>IVA por Pagar (débito fiscal)</td><td>4,200</td><td>—</td></tr>
+              <tr><td class="indent">IVA por Cobrar / Caja</td><td>—</td><td>2,400 / 1,800</td></tr>
+            </tbody>
+          </table>
+          <p class="glosa">El IVA pagado en compras (crédito fiscal) y el cobrado en ventas (débito fiscal) no son ingresos ni gastos: solo la diferencia entre ambos se paga o se recupera ante la administración tributaria.</p>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="ad-slot inline">[ Espacio publicitario · Google AdSense ]</div></div>
+
+<section id="calculadora">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Herramientas</p>
+      <h2>Calculadoras contables</h2>
+      <p>Aplica los procesos de arriba a tus propios números.</p>
+    </div>
+    <div class="calc-grid">
+
+      <div class="calc-card">
+        <h3>Validador de partida doble</h3>
+        <p>Ingresa tus cuentas con su Debe y Haber. Verifica si la partida está balanceada.</p>
+        <div class="calc-row header-row"><span>Cuenta</span><span>Debe</span><span>Haber</span><span></span></div>
+        <div id="partidaRows">
+          <div class="calc-row">
+            <input type="text" placeholder="Caja" class="p-cuenta">
+            <input type="number" placeholder="0" class="p-debe">
+            <input type="number" placeholder="0" class="p-haber">
+            <button class="row-del" onclick="this.parentElement.remove()" aria-label="Eliminar fila">×</button>
+          </div>
+          <div class="calc-row">
+            <input type="text" placeholder="Capital Social" class="p-cuenta">
+            <input type="number" placeholder="0" class="p-debe">
+            <input type="number" placeholder="0" class="p-haber">
+            <button class="row-del" onclick="this.parentElement.remove()" aria-label="Eliminar fila">×</button>
+          </div>
+        </div>
+        <div class="calc-actions">
+          <button class="btn-mini" onclick="agregarFilaPartida()">+ Agregar cuenta</button>
+          <button class="btn-mini solid" onclick="verificarPartida()">Verificar partida</button>
+        </div>
+        <div id="partidaResult" class="calc-result"></div>
+      </div>
+
+      <div class="calc-card">
+        <h3>Simulador de depreciación</h3>
+        <p>Método de línea recta: (costo − valor de rescate) ÷ vida útil.</p>
+        <div class="field"><label for="depCosto">Costo del activo (Q)</label><input type="number" id="depCosto" placeholder="12000"></div>
+        <div class="field"><label for="depVida">Vida útil (años)</label><input type="number" id="depVida" placeholder="4"></div>
+        <div class="field"><label for="depRescate">Valor de rescate (Q, opcional)</label><input type="number" id="depRescate" placeholder="0"></div>
+        <div class="calc-actions">
+          <button class="btn-mini solid" onclick="calcularDepreciacion()">Calcular</button>
+        </div>
+        <div id="depResult" class="calc-result"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="glosario" class="process">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Referencia rápida</p>
+      <h2>Glosario de términos contables</h2>
+      <p>Busca cualquier término para ver su definición.</p>
+    </div>
+    <input type="text" class="glossary-search" placeholder="Buscar un término, ej. 'devengado'..." oninput="filtrarGlosario(this.value)">
+    <p class="gloss-empty" id="glossEmpty">No se encontró ningún término con ese texto.</p>
+    <div class="glossary-grid" id="glossaryGrid">
+      <div class="gloss-card" data-term="activo"><b>Activo</b><p>Bien o derecho que posee la empresa y que se espera genere beneficios económicos futuros.</p></div>
+      <div class="gloss-card" data-term="pasivo"><b>Pasivo</b><p>Obligación presente de la empresa con un tercero, surgida de eventos pasados.</p></div>
+      <div class="gloss-card" data-term="patrimonio"><b>Patrimonio</b><p>Diferencia entre el activo y el pasivo; representa el derecho de los propietarios.</p></div>
+      <div class="gloss-card" data-term="partida doble"><b>Partida doble</b><p>Principio según el cual toda transacción afecta al menos dos cuentas en montos iguales.</p></div>
+      <div class="gloss-card" data-term="debe haber"><b>Debe / Haber</b><p>Lado izquierdo y derecho de una cuenta contable, usados para registrar cargos y créditos.</p></div>
+      <div class="gloss-card" data-term="asiento contable partida"><b>Asiento contable</b><p>Registro formal de una transacción en el Libro Diario.</p></div>
+      <div class="gloss-card" data-term="glosa"><b>Glosa</b><p>Breve explicación que acompaña a un asiento contable.</p></div>
+      <div class="gloss-card" data-term="libro diario"><b>Libro Diario</b><p>Registro cronológico de todas las transacciones de la empresa.</p></div>
+      <div class="gloss-card" data-term="libro mayor"><b>Libro Mayor</b><p>Registro que agrupa los movimientos de cada cuenta para conocer su saldo.</p></div>
+      <div class="gloss-card" data-term="mayorizacion"><b>Mayorización</b><p>Proceso de trasladar los movimientos del Diario al Mayor.</p></div>
+      <div class="gloss-card" data-term="cuenta t"><b>Cuenta T</b><p>Representación simplificada de una cuenta, con forma de letra T.</p></div>
+      <div class="gloss-card" data-term="balance de comprobacion"><b>Balance de Comprobación</b><p>Listado de los saldos de todas las cuentas, usado para verificar el equilibrio contable.</p></div>
+      <div class="gloss-card" data-term="saldo deudor"><b>Saldo deudor</b><p>Saldo de una cuenta cuando el total del Debe es mayor que el del Haber.</p></div>
+      <div class="gloss-card" data-term="saldo acreedor"><b>Saldo acreedor</b><p>Saldo de una cuenta cuando el total del Haber es mayor que el del Debe.</p></div>
+      <div class="gloss-card" data-term="depreciacion"><b>Depreciación</b><p>Distribución sistemática del costo de un activo fijo durante su vida útil.</p></div>
+      <div class="gloss-card" data-term="devengado"><b>Devengado</b><p>Reconocimiento de ingresos o gastos cuando ocurren, sin importar el cobro o pago.</p></div>
+      <div class="gloss-card" data-term="diferido"><b>Diferido</b><p>Ingreso o gasto pagado o cobrado por anticipado, reconocido poco a poco en periodos futuros.</p></div>
+      <div class="gloss-card" data-term="provision estimacion"><b>Provisión / Estimación</b><p>Reconocimiento anticipado de una posible pérdida o gasto futuro probable.</p></div>
+      <div class="gloss-card" data-term="estado de resultados"><b>Estado de Resultados</b><p>Estado financiero que muestra la utilidad o pérdida de un periodo.</p></div>
+      <div class="gloss-card" data-term="balance general"><b>Balance General</b><p>Estado financiero que muestra el activo, pasivo y patrimonio en una fecha determinada.</p></div>
+      <div class="gloss-card" data-term="activo corriente"><b>Activo corriente</b><p>Activo que se espera convertir en efectivo o consumir en un plazo de un año.</p></div>
+      <div class="gloss-card" data-term="pasivo corriente"><b>Pasivo corriente</b><p>Obligación que se espera liquidar en un plazo de un año.</p></div>
+      <div class="gloss-card" data-term="cierre contable"><b>Cierre contable</b><p>Proceso de saldar a cero las cuentas nominales (ingresos y gastos) al final del periodo.</p></div>
+      <div class="gloss-card" data-term="periodo contable"><b>Periodo contable</b><p>Lapso de tiempo (mes, año) sobre el cual se mide el resultado de una empresa.</p></div>
+      <div class="gloss-card" data-term="pcga"><b>PCGA</b><p>Principios de Contabilidad Generalmente Aceptados.</p></div>
+      <div class="gloss-card" data-term="niif"><b>NIIF</b><p>Normas Internacionales de Información Financiera.</p></div>
+      <div class="gloss-card" data-term="iva"><b>IVA</b><p>Impuesto al Valor Agregado, aplicado sobre la mayoría de compras y ventas.</p></div>
+      <div class="gloss-card" data-term="credito fiscal"><b>Crédito fiscal</b><p>IVA pagado en las compras, recuperable contra el IVA cobrado en las ventas.</p></div>
+      <div class="gloss-card" data-term="debito fiscal"><b>Débito fiscal</b><p>IVA cobrado en las ventas, que debe enterarse a la administración tributaria.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="testimonios">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Testimonios</p>
+      <h2>Lo que dicen quienes ya usan la biblioteca</h2>
+    </div>
+    <div class="testimonials">
+      <div class="quote">
+        <p>"No necesitaba un curso completo, solo saber cómo registrar bien las ventas del día. El proceso 100 me lo resolvió en diez minutos."</p>
+        <div class="who"><div class="avatar">M</div><div><b>Mariana Soto</b><span>Repostería independiente</span></div></div>
+      </div>
+      <div class="quote">
+        <p>"Buscaba cómo hacer los ajustes de fin de mes en YouTube. Aquí encontré el procedimiento exacto, con el asiento ya resuelto."</p>
+        <div class="who"><div class="avatar">D</div><div><b>Diego Ramírez</b><span>Diseñador freelance</span></div></div>
+      </div>
+      <div class="quote">
+        <p>"La uso como referencia rápida en mi trabajo. Cuando se me olvida un proceso, lo busco por su código y ahí está, sin rodeos."</p>
+        <div class="who"><div class="avatar">C</div><div><b>Carla Núñez</b><span>Asistente contable junior</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="closer">
+  <div class="wrap">
+    <p class="eyebrow" style="justify-content:center;color:#E9C46A;">Tu primer proceso está a un clic</p>
+    <h2>Deja de buscar en YouTube cada vez que olvidas un proceso.</h2>
+    <p>Encuéntralos todos aquí, explicados paso a paso y con ejemplo resuelto.</p>
+    <a href="#procesos" class="cta-btn">Explorar procesos</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-grid">
+    <a href="#" class="brand"><span class="brand-mark">LM</span>Libro Mayor</a>
+    <p>© 2026 Libro Mayor · Biblioteca de procesos contables</p>
+  </div>
+</footer>
+
+<script>
+function agregarFilaPartida(){
+  const cont = document.getElementById('partidaRows');
+  const row = document.createElement('div');
+  row.className = 'calc-row';
+  row.innerHTML = '<input type="text" placeholder="Cuenta" class="p-cuenta">' +
+    '<input type="number" placeholder="0" class="p-debe">' +
+    '<input type="number" placeholder="0" class="p-haber">' +
+    '<button class="row-del" onclick="this.parentElement.remove()" aria-label="Eliminar fila">×</button>';
+  cont.appendChild(row);
+}
+
+function verificarPartida(){
+  const debes = document.querySelectorAll('.p-debe');
+  const habers = document.querySelectorAll('.p-haber');
+  let totalDebe = 0, totalHaber = 0;
+  debes.forEach(i => totalDebe += parseFloat(i.value) || 0);
+  habers.forEach(i => totalHaber += parseFloat(i.value) || 0);
+  const result = document.getElementById('partidaResult');
+  result.classList.add('show');
+  if (debes.length === 0) {
+    result.className = 'calc-result show bad';
+    result.textContent = 'Agrega al menos una cuenta antes de verificar.';
+    return;
+  }
+  if (totalDebe === totalHaber) {
+    result.className = 'calc-result show ok';
+    result.textContent = '✓ Partida balanceada — Debe: ' + totalDebe.toLocaleString() + ' = Haber: ' + totalHaber.toLocaleString();
+  } else {
+    const diff = Math.abs(totalDebe - totalHaber);
+    result.className = 'calc-result show bad';
+    result.textContent = '✗ No balancea — Debe: ' + totalDebe.toLocaleString() + ' / Haber: ' + totalHaber.toLocaleString() + ' (diferencia: ' + diff.toLocaleString() + ')';
+  }
+}
+
+function calcularDepreciacion(){
+  const costo = parseFloat(document.getElementById('depCosto').value) || 0;
+  const vida = parseFloat(document.getElementById('depVida').value) || 0;
+  const rescate = parseFloat(document.getElementById('depRescate').value) || 0;
+  const result = document.getElementById('depResult');
+  result.classList.add('show');
+  if (costo <= 0 || vida <= 0) {
+    result.className = 'calc-result show bad';
+    result.textContent = 'Ingresa al menos el costo y la vida útil del activo.';
+    return;
+  }
+  const anual = (costo - rescate) / vida;
+  const mensual = anual / 12;
+  result.className = 'calc-result show ok';
+  result.innerHTML = 'Cuota anual: Q' + anual.toLocaleString(undefined,{maximumFractionDigits:2}) +
+    '<br>Cuota mensual: Q' + mensual.toLocaleString(undefined,{maximumFractionDigits:2}) +
+    '<br><br>Asiento mensual:<br>Gasto de Depreciación — Debe Q' + mensual.toLocaleString(undefined,{maximumFractionDigits:2}) +
+    '<br>Depreciación Acumulada — Haber Q' + mensual.toLocaleString(undefined,{maximumFractionDigits:2});
+}
+
+function filtrarGlosario(texto){
+  const q = texto.trim().toLowerCase();
+  const cards = document.querySelectorAll('.gloss-card');
+  let visibles = 0;
+  cards.forEach(card => {
+    const match = card.dataset.term.includes(q) || card.textContent.toLowerCase().includes(q);
+    card.style.display = match ? '' : 'none';
+    if (match) visibles++;
+  });
+  document.getElementById('glossEmpty').style.display = visibles === 0 ? 'block' : 'none';
+}
+</script>
+
+</body>
+</html>
