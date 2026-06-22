@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Libro Mayor — Procesos contables paso a paso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F1E7;
+    --paper-deep:#EFE7D6;
+    --ink:#1F2A24;
+    --ledger:#1F4D3D;
+    --ledger-dark:#163829;
+    --debit:#A3413B;
+    --gold:#B6862F;
+    --line:#D8CFB8;
+    --line-soft:#E4DCC8;
+    --max:1120px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  img,svg{display:block;max-width:100%;}
+  a{color:inherit;}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 28px;}
+
+  /* ruled-paper texture */
+  .ruled{
+    background-image:repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 38px,
+      var(--line-soft) 39px
+    );
+  }
+
+  h1,h2,h3{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--ledger);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .eyebrow::before{
+    content:'';
+    width:6px;height:6px;border-radius:50%;
+    background:var(--debit);
+    flex:none;
+  }
+  .num{font-family:'IBM Plex Mono',monospace;}
+
+  :focus-visible{
+    outline:3px solid var(--gold);
+    outline-offset:3px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(246,241,231,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 0;
+  }
+  .brand{
+    display:flex;align-items:center;gap:10px;
+    font-family:'Fraunces',serif;font-weight:700;font-size:21px;
+    text-decoration:none;color:var(--ink);
+  }
+  .brand-mark{
+    width:30px;height:30px;border:1.6px solid var(--ledger);border-radius:3px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;
+    color:var(--ledger);
+    background:var(--paper);
+  }
+  nav.links{display:flex;gap:30px;font-size:14.5px;font-weight:500;}
+  nav.links a{text-decoration:none;opacity:0.8;transition:opacity .15s;}
+  nav.links a:hover{opacity:1;}
+  .cta-btn{
+    background:var(--ledger);color:var(--paper);
+    padding:10px 20px;border-radius:3px;
+    font-size:14px;font-weight:600;text-decoration:none;
+    border:1px solid var(--ledger);
+    transition:transform .15s ease, background .15s ease;
+    white-space:nowrap;
+  }
+  .cta-btn:hover{background:var(--ledger-dark);transform:translateY(-1px);}
+  .cta-ghost{
+    background:transparent;color:var(--ink);border:1px solid var(--ink);
+  }
+  .cta-ghost:hover{background:var(--ink);color:var(--paper);}
+  .menu-toggle{display:none;background:none;border:none;font-size:24px;cursor:pointer;color:var(--ink);}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:84px 0 70px;position:relative;}
+  .hero-grid{
+    display:grid;grid-template-columns:1.05fr 0.95fr;gap:56px;align-items:center;
+  }
+  .hero h1{
+    font-size:clamp(34px,4.4vw,54px);
+    line-height:1.06;
+    margin:18px 0 22px;
+  }
+  .hero h1 em{
+    font-style:normal;color:var(--ledger);
+    border-bottom:3px double var(--gold);
+  }
+  .hero p.lead{
+    font-size:17.5px;max-width:480px;color:#3a4540;margin-bottom:30px;
+  }
+  .hero-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+  .hero-note{
+    margin-top:18px;font-size:13px;color:#5b655f;font-family:'IBM Plex Mono',monospace;
+  }
+
+  /* T-account signature visual */
+  .taccount{
+    background:var(--paper-deep);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:26px 26px 18px;
+    box-shadow:0 18px 40px -22px rgba(31,42,36,0.35);
+  }
+  .taccount-title{
+    text-align:center;font-family:'IBM Plex Mono',monospace;
+    font-size:12px;letter-spacing:0.1em;text-transform:uppercase;
+    color:#6b6354;margin-bottom:14px;
+  }
+  .t-head{
+    display:grid;grid-template-columns:1fr 1fr;
+    font-family:'Fraunces',serif;font-weight:600;font-size:15px;
+    text-align:center;padding-bottom:10px;position:relative;
+  }
+  .t-head::after{
+    content:'';position:absolute;left:50%;top:0;bottom:-2px;width:1px;background:var(--ink);
+  }
+  .t-head span:first-child{color:var(--debit);}
+  .t-head span:last-child{color:var(--ledger);}
+  .t-rule{height:2px;background:var(--ink);margin-bottom:14px;}
+  .t-body{display:grid;grid-template-columns:1fr 1fr;gap:0 0;position:relative;min-height:170px;}
+  .t-body::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line);}
+  .t-col{padding:2px 16px 6px;font-size:13.5px;}
+  .t-col.debit{padding-right:18px;}
+  .t-col.credit{padding-left:18px;}
+  .t-row{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);}
+  .t-row:last-child{border-bottom:none;}
+  .t-row .v{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5b655f;flex:none;}
+  .t-total{
+    margin-top:10px;padding-top:10px;border-top:3px double var(--ink);
+    display:grid;grid-template-columns:1fr 1fr;font-family:'IBM Plex Mono',monospace;
+    font-size:13px;font-weight:600;text-align:center;color:var(--ink);
+  }
+
+  /* ---------- Sections shared ---------- */
+  section{padding:78px 0;}
+  .section-head{max-width:620px;margin-bottom:46px;}
+  .section-head h2{font-size:clamp(26px,3vw,36px);margin-top:14px;}
+  .section-head p{color:#454f49;font-size:16px;margin-top:12px;}
+  .divider{
+    border:none;border-top:3px double var(--line);max-width:var(--max);margin:0 auto;
+  }
+
+  /* stats */
+  .stats{background:var(--ledger);color:var(--paper);}
+  .stats .wrap{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:30px;
+  }
+  .stat b{
+    display:block;font-family:'IBM Plex Mono',monospace;font-size:clamp(26px,3.6vw,38px);
+    color:#E9C46A;font-weight:600;
+  }
+  .stat span{font-size:13.5px;opacity:0.85;display:block;margin-top:6px;}
+
+  /* Curriculum = chart of accounts */
+  .accounts{display:flex;flex-direction:column;border-top:1px solid var(--line);}
+  .account{
+    display:grid;grid-template-columns:90px 1fr auto;gap:18px;align-items:start;
+    padding:24px 0;border-bottom:1px solid var(--line);
+  }
+  .account .code{
+    font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--debit);font-weight:600;
+    padding-top:2px;
+  }
+  .account h3{font-size:18px;margin-bottom:6px;}
+  .account p{margin:0;color:#454f49;font-size:14.5px;max-width:520px;}
+  .account .meta{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6b6354;text-align:right;
+    white-space:nowrap;padding-top:4px;
+  }
+  .badge-free{color:var(--ledger);font-weight:600;}
+  .badge-lock{color:var(--debit);}
+
+  /* Ad placeholder slots */
+  .ad-slot{
+    border:1.5px dashed var(--line);border-radius:6px;
+    background:var(--paper-deep);
+    padding:22px;text-align:center;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;
+    color:#8a8268;letter-spacing:0.03em;
+  }
+  .ad-slot.banner{max-width:var(--max);margin:0 auto;padding:18px;}
+  .ad-slot.inline{margin:50px 0;}
+
+  /* Process */
+  .process{background:var(--paper-deep);}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+  .step{
+    background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:24px 20px;
+    position:relative;
+  }
+  .step .stepnum{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--paper);
+    background:var(--ledger);width:30px;height:30px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-weight:600;
+  }
+  .step h3{font-size:16px;margin-bottom:8px;}
+  .step p{margin:0;font-size:13.5px;color:#454f49;}
+
+  /* Pricing */
+  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .plan{
+    border:1px solid var(--line);border-radius:8px;padding:30px 26px;
+    background:var(--paper);display:flex;flex-direction:column;
+  }
+  .plan.featured{
+    border-color:var(--ledger);box-shadow:0 18px 36px -24px rgba(31,77,61,0.45);
+    position:relative;
+  }
+  .plan.featured::before{
+    content:'MÁS ELEGIDO';position:absolute;top:-12px;right:24px;
+    background:var(--debit);color:#fff;font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;letter-spacing:0.08em;padding:4px 10px;border-radius:3px;
+  }
+  .plan-name{font-family:'Fraunces',serif;font-size:19px;font-weight:600;}
+  .plan-price{
+    font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;margin:14px 0 4px;
+  }
+  .plan-price span{font-size:14px;color:#6b6354;font-weight:400;}
+  .plan-desc{font-size:13.5px;color:#6b6354;margin-bottom:20px;}
+  .plan ul{list-style:none;margin:0 0 26px;padding:0;flex:1;}
+  .plan li{
+    font-size:14px;padding:9px 0;border-bottom:1px dashed var(--line);display:flex;gap:10px;
+  }
+  .plan li:last-child{border-bottom:none;}
+  .plan li::before{content:'✓';color:var(--ledger);font-weight:700;flex:none;}
+
+  /* testimonials */
+  .testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .quote{
+    background:var(--paper-deep);border-radius:8px;padding:26px;border:1px solid var(--line);
+  }
+  .quote p{font-size:14.5px;font-style:italic;color:#33392f;margin:0 0 16px;}
+  .quote .who{display:flex;align-items:center;gap:10px;}
+  .avatar{
+    width:36px;height:36px;border-radius:50%;background:var(--ledger);color:var(--paper);
+    display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:600;
+    font-size:14px;flex:none;
+  }
+  .who b{font-size:13.5px;display:block;}
+  .who span{font-size:12px;color:#6b6354;}
+
+  /* CTA final */
+  .closer{
+    background:var(--ledger-dark);color:var(--paper);text-align:center;
+    padding:90px 0;
+  }
+  .closer h2{font-size:clamp(28px,4vw,42px);max-width:680px;margin:0 auto 16px;}
+  .closer p{opacity:0.85;max-width:480px;margin:0 auto 30px;font-size:16px;}
+  .closer .cta-btn{background:var(--gold);border-color:var(--gold);color:#1F2A24;}
+  .closer .cta-btn:hover{background:#9c7426;}
+
+  footer{padding:40px 0;border-top:1px solid var(--line);}
+  .foot-grid{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;}
+  .foot-grid .brand{font-size:16px;}
+  footer p{font-size:13px;color:#6b6354;margin:0;}
+
+  @media (max-width:880px){
+    .hero-grid{grid-template-columns:1fr;}
+    nav.links{display:none;}
+    .menu-toggle{display:block;}
+    .stats .wrap{grid-template-columns:repeat(2,1fr);}
+    .steps{grid-template-columns:1fr 1fr;}
+    .plans{grid-template-columns:1fr;}
+    .testimonials{grid-template-columns:1fr;}
+    .account{grid-template-columns:60px 1fr;}
+    .account .meta{display:none;}
+  }
+  @media (max-width:520px){
+    .hero{padding:60px 0 50px;}
+    .stats .wrap{grid-template-columns:1fr 1fr;gap:22px;}
+    .steps{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="#" class="brand">
+      <span class="brand-mark">LM</span>
+      Libro Mayor
+    </a>
+    <nav class="links">
+      <a href="#procesos">Procesos</a>
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#testimonios">Testimonios</a>
+    </nav>
+    <a href="#procesos" class="cta-btn">Explorar procesos</a>
+  </div>
+</header>
+
+<section class="hero ruled">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">Biblioteca de procesos contables · 100% gratis</p>
+      <h1>Cada proceso contable, explicado<br>paso a paso. <em>Sin cursos de relleno.</em></h1>
+      <p class="lead">Busca exactamente cómo hacer una partida, cerrar el mes o conciliar un banco — con el procedimiento exacto, ejemplo numérico y plantilla descargable. Sin lecciones largas: el paso a paso que necesitas, cuando lo necesitas.</p>
+      <div class="hero-actions">
+        <a href="#procesos" class="cta-btn">Ver procesos</a>
+        <a href="#como-funciona" class="cta-btn cta-ghost">Cómo funciona</a>
+      </div>
+      <p class="hero-note">+180 procesos documentados · actualizados cada mes · acceso libre</p>
+    </div>
+
+    <div class="taccount">
+      <p class="taccount-title">Ejemplo: partida por pago de nómina</p>
+      <div class="t-head"><span>DEBE</span><span>HABER</span></div>
+      <div class="t-rule"></div>
+      <div class="t-body">
+        <div class="t-col debit">
+          <div class="t-row"><span>Gastos de nómina</span><span class="v">$5,000</span></div>
+        </div>
+        <div class="t-col credit">
+          <div class="t-row"><span>Banco</span><span class="v">$5,000</span></div>
+        </div>
+      </div>
+      <div class="t-total"><span>Total: $5,000</span><span>Total: $5,000</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="ad-slot banner">[ Espacio publicitario · Google AdSense ]</div>
+</div>
+
+<section class="stats">
+  <div class="wrap">
+    <div class="stat"><b class="num">+180</b><span>procesos documentados en la biblioteca</span></div>
+    <div class="stat"><b class="num">4.8/5</b><span>calificación promedio de los lectores</span></div>
+    <div class="stat"><b class="num">24h</b><span>tiempo de respuesta a procesos solicitados</span></div>
+    <div class="stat"><b class="num">+40</b><span>plantillas descargables incluidas</span></div>
+  </div>
+</section>
+
+<section id="procesos">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Plan de cuentas de la biblioteca</p>
+      <h2>Cada proceso, con su propio código — como en un plan de cuentas real</h2>
+      <p>Selecciona un proceso y sigue el procedimiento exacto, paso a paso.</p>
+    </div>
+    <div class="accounts">
+      <div class="account">
+        <div class="code num">100</div>
+        <div>
+          <h3>Cómo hacer una partida contable</h3>
+          <p>El registro de doble entrada explicado desde cero: qué cuenta se debita, cuál se acredita y por qué.</p>
+        </div>
+        <div class="meta badge-free">4 min</div>
+      </div>
+      <div class="account">
+        <div class="code num">200</div>
+        <div>
+          <h3>Cómo cerrar el período contable</h3>
+          <p>El procedimiento completo de cierre de mes, con la lista de verificación que usan los contables.</p>
+        </div>
+        <div class="meta">6 min</div>
+      </div>
+      <div class="account">
+        <div class="code num">300</div>
+        <div>
+          <h3>Cómo conciliar una cuenta bancaria</h3>
+          <p>Paso a paso para cruzar tu libro contable contra el extracto del banco y encontrar diferencias.</p>
+        </div>
+        <div class="meta">5 min</div>
+      </div>
+      <div class="account">
+        <div class="code num">400</div>
+        <div>
+          <h3>Cómo calcular y registrar la depreciación</h3>
+          <p>Métodos de depreciación más usados, con la fórmula aplicada a un ejemplo numérico real.</p>
+        </div>
+        <div class="meta">5 min</div>
+      </div>
+      <div class="account">
+        <div class="code num">500</div>
+        <div>
+          <h3>Cómo armar un estado de resultados desde cero</h3>
+          <p>De las cuentas individuales al estado financiero final, línea por línea.</p>
+        </div>
+        <div class="meta">7 min</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="como-funciona" class="process">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">El uso</p>
+      <h2>Cómo funciona la biblioteca</h2>
+      <p>Así encuentras y aplicas cada proceso, sin vueltas.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="stepnum num">1</div>
+        <h3>Busca tu proceso</h3>
+        <p>Encuéntralo por nombre o por su código, como en un plan de cuentas.</p>
+      </div>
+      <div class="step">
+        <div class="stepnum num">2</div>
+        <h3>Lee el procedimiento</h3>
+        <p>Cada proceso trae los pasos exactos, sin teoría de relleno.</p>
+      </div>
+      <div class="step">
+        <div class="stepnum num">3</div>
+        <h3>Revisa el ejemplo numérico</h3>
+        <p>Verás el caso aplicado con cifras reales, incluida la partida resultante.</p>
+      </div>
+      <div class="step">
+        <div class="stepnum num">4</div>
+        <h3>Descarga la plantilla</h3>
+        <p>Si el proceso la incluye, la usas directo en tu propio caso.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="precios">
+  <div class="wrap">
+    <div class="ad-slot inline">[ Espacio publicitario · Google AdSense ]</div>
+  </div>
+</section>
+
+<section id="testimonios">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Testimonios</p>
+      <h2>Lo que dicen quienes ya llevan sus cuentas en orden</h2>
+    </div>
+    <div class="testimonials">
+      <div class="quote">
+        <p>“No necesitaba un curso completo, solo saber cómo registrar bien las ventas del día. El proceso 100 me lo resolvió en diez minutos.”</p>
+        <div class="who">
+          <div class="avatar">M</div>
+          <div><b>Mariana Soto</b><span>Repostería independiente</span></div>
+        </div>
+      </div>
+      <div class="quote">
+        <p>“Buscaba ‘cómo conciliar mi banco’ en YouTube cada mes. Aquí encontré el procedimiento exacto, con la plantilla ya lista para usar.”</p>
+        <div class="who">
+          <div class="avatar">D</div>
+          <div><b>Diego Ramírez</b><span>Diseñador freelance</span></div>
+        </div>
+      </div>
+      <div class="quote">
+        <p>“La uso como referencia rápida en mi trabajo. Cuando se me olvida un proceso, lo busco por su código y ahí está, sin rodeos.”</p>
+        <div class="who">
+          <div class="avatar">C</div>
+          <div><b>Carla Núñez</b><span>Asistente contable junior</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="closer">
+  <div class="wrap">
+    <p class="eyebrow" style="justify-content:center;color:#E9C46A;">Tu primer proceso está a un clic</p>
+    <h2>Deja de buscar en YouTube cada vez que olvidas un proceso.</h2>
+    <p>Encuéntralos todos aquí, explicados paso a paso y con plantilla incluida.</p>
+    <a href="#procesos" class="cta-btn">Explorar procesos</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-grid">
+    <a href="#" class="brand"><span class="brand-mark">LM</span>Libro Mayor</a>
+    <p>© 2026 Libro Mayor · Biblioteca de procesos contables</p>
+  </div>
+</footer>
+
+</body>
+</html>
